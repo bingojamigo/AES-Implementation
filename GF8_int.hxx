@@ -32,12 +32,6 @@ struct GF8_int
     }
 };
 
-  /// For dumping HEX-values
-inline std::ostream& operator<<( std::ostream& os, GF8_int i )
-{
-    return os << std::hex << short(i.value);
-}
-
 inline GF8_int operator+( GF8_int a, GF8_int b )
 {
     return a.value ^ b.value;

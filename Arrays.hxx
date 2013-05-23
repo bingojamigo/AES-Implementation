@@ -11,7 +11,7 @@ extern std::array<byte, 256> const InverseSBox;
 
 word getRcon(size_t i);
 
-SubByte( byte b );
+byte SubByte( byte b );
 
 word SubWord(word w);
 
