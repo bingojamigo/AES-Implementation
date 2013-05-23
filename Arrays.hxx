@@ -9,27 +9,12 @@ extern std::array<byte, 256> const Rcon;
 extern std::array<byte, 256> const SBox;
 extern std::array<byte, 256> const InverseSBox;
 
-inline word getRcon(size_t i)
-{
-    return word(Rcon[i]) << 24;
-}
+word getRcon(size_t i);
 
-inline byte SubByte( byte b )
-{
-    return SBox[b];
-}
+SubByte( byte b );
 
-inline word SubWord(word w)
-{
-    return word_from( SBox[ get_byte(w, 0) ],
-                      SBox[ get_byte(w, 1) ],
-                      SBox[ get_byte(w, 2) ],
-                      SBox[ get_byte(w, 3) ] );
-}
+word SubWord(word w);
 
-inline byte InvSubByte( byte b )
-{
-    return InverseSBox[b];
-}
+byte InvSubByte( byte b );
 
 #endif // ARRAYS_HXX_INCLUDED

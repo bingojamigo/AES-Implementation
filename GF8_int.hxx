@@ -1,7 +1,7 @@
 #ifndef GF8_INT_HXX_INCLUDED
 #define GF8_INT_HXX_INCLUDED
 
-#include <cstdint>
+#include "Basic.hxx"
 
 struct GF8_int;
 

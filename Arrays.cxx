@@ -59,3 +59,26 @@ std::array<byte, 256> const InverseSBox
     0xA0, 0xE0, 0x3B, 0x4D, 0xAE, 0x2A, 0xF5, 0xB0, 0xC8, 0xEB, 0xBB, 0x3C, 0x83, 0x53, 0x99, 0x61,
     0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D
 };
+
+word getRcon(size_t i)
+{
+    return word(Rcon[i]) << 24;
+}
+
+byte SubByte( byte b )
+{
+    return SBox[b];
+}
+
+word SubWord(word w)
+{
+    return word_from( SBox[ get_byte(w, 0) ],
+                      SBox[ get_byte(w, 1) ],
+                      SBox[ get_byte(w, 2) ],
+                      SBox[ get_byte(w, 3) ] );
+}
+
+byte InvSubByte( byte b )
+{
+    return InverseSBox[b];
+}
