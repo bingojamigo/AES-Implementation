@@ -5,7 +5,6 @@
 
 #include "Key.hxx"
 #include "Arrays.hxx"
-#include "GF8_int.hxx"
 
 typedef byte state_type[4][Nb];
 typedef byte (&state_type_reference)[4][Nb];
@@ -23,14 +22,8 @@ extern std::array<byte, 4> const mixColCoefficientsCipher,
  * \param state The state-Array
  * \param w A pointer to Nb consecutive words in memory who are the keys
  */
-template<typename KeyIter>
 void AddRoundKey( state_type_reference state,
-                  KeyIter w)
-{
-    for( size_t r = 0; r < 4; ++r )
-        for( size_t c = 0; c < Nb; ++c )
-            state[r][c] ^= get_byte(w[c], 4-r-1);
-}
+                  word const* w);
 
 void SubBytes( state_type_reference state, bool inverse );
 
@@ -61,9 +54,8 @@ void KeyExpansion( Key<Nk> const& key, expanded_key_type<Nk>& w )
 
 /// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<bool inputToState,
-         typename Iter>
-void copy( Iter first, Iter last, state_type_reference state )
+template<bool inputToState>
+void copy( byte* first, byte* last, state_type_reference state )
 {
     for( unsigned r = 0; r < 4; ++r )
         for( unsigned c = 0; c < Nb; ++c )
@@ -80,13 +72,10 @@ void copy( Iter first, Iter last, state_type_reference state )
 }
 
 /// [message, message + 16) is being crypted
-template<KeySize Nk,
-         typename Iter,
-         typename Size,
-         typename KeyIter>
-void Cipher( Iter message,
-             Size maximum, /// message + maximum is considered the end
-             KeyIter w )
+template<KeySize Nk>
+void Cipher( byte* message,
+             std::size_t maximum, /// message + maximum is considered the end
+             word const* w )
 {
     state_type state;
 
@@ -109,13 +98,10 @@ void Cipher( Iter message,
     copy<false>( message, message + maximum, state );
 }
 
-template<KeySize Nk,
-         typename Iter,
-         typename Size,
-         typename KeyIter>
-void InvCipher( Iter message, /// An iterator pointing to the message
-                Size maximum, /// message + maximum is considered the end
-                KeyIter w )
+template<KeySize Nk>
+void InvCipher( byte* message, /// An iterator pointing to the message
+                std::size_t maximum, /// message + maximum is considered the end
+                word const* w )
 {
     state_type state;
 
@@ -164,9 +150,8 @@ public:
     RijndaelCrypt( this_expanded_key_type const& ex_keys ):
         mKeyArray{ex_keys} {}
 
-    template<typename Iter,
-             typename CryptFunc>
-    void ApplyCrypt( Iter first, Iter last, CryptFunc crypter )
+    template<typename CryptFunc>
+    void ApplyCrypt( byte* first, byte* last, CryptFunc crypter )
     {
         int dist = std::distance(first, last);
 
@@ -178,13 +163,11 @@ public:
         }
     }
 
-    template<typename Iter>
-    void Encrypt( Iter first, Iter last )
-    { ApplyCrypt(first, last, Cipher<key_size, Iter, int, typename this_expanded_key_type::iterator>); }
+    void Encrypt( byte* first, byte* last )
+    { ApplyCrypt(first, last, Cipher<key_size>); }
 
-    template<typename Iter>
-    void Decrypt( Iter first, Iter last )
-    { ApplyCrypt(first, last, InvCipher<key_size, Iter, int, typename this_expanded_key_type::iterator>); }
+    void Decrypt( byte* first, byte* last )
+    { ApplyCrypt(first, last, InvCipher<key_size>); }
 
 };
 

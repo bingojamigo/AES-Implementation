@@ -24,16 +24,14 @@ inline byte get_byte( word w, uint8_t N )
     return w >> N*8;
 }
 
-template<typename Int>
-Int cyclicBitLeftShift( Int val, std::size_t width )
+inline word cyclicBitLeftShift( word val, std::size_t width )
 {
-    return (val << width) | val >> (sizeof(Int)*CHAR_BIT - width);
+    return (val << width) | val >> (32 - width);
 }
 
-template<typename Int>
-Int cyclicBitRightShift( Int val, std::size_t width )
+inline word cyclicBitRightShift( word val, std::size_t width )
 {
-    return (val >> width) | val << (sizeof(Int)*CHAR_BIT - width);
+    return (val >> width) | val << (32 - width);
 }
 
 inline word reverseBytes( word a )
