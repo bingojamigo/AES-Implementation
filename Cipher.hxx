@@ -121,7 +121,6 @@ void InvCipher( byte* message, /// An iterator pointing to the message
             MixColumns(state, mixColCoefficientsInverseCipher);
     }
 
-
     copy<false>( message, message + maximum, state );
 }
 
@@ -157,7 +156,7 @@ public:
 
         while( dist > 0 )
         {
-            crypter( first, dist, std::begin(mKeyArray) );
+            crypter( first, dist, mKeyArray.data() );
             dist -= 4 * Nb;
             first += 4 * Nb;
         }
