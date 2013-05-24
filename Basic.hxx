@@ -1,10 +1,12 @@
 #ifndef BASIC_HXX_INCLUDED
 #define BASIC_HXX_INCLUDED
 
-#include <cstdint>
+#include <type_traits> // enable_if
 
 #define REQUIRES(...) ,class=typename std::enable_if<(__VA_ARGS__)>::type
 #define AUTO_RETURN(...) decltype(__VA_ARGS__) { return (__VA_ARGS__); }
+
+#include <cstdint>
 
 typedef uint8_t byte;
 typedef uint32_t word;
@@ -16,8 +18,6 @@ inline word word_from( byte a, byte b, byte c, byte d )
          | static_cast<word>(c) << 16
          | static_cast<word>(d) << 24;
 }
-
-#include <climits>
 
 inline byte get_byte( word w, uint8_t N )
 {
@@ -32,14 +32,6 @@ inline word cyclicBitLeftShift( word val, std::size_t width )
 inline word cyclicBitRightShift( word val, std::size_t width )
 {
     return (val >> width) | val << (32 - width);
-}
-
-inline word reverseBytes( word a )
-{
-    return word_from( a >> 24,
-                      a >> 16,
-                      a >> 8,
-                      a );
 }
 
 #endif // BASIC_HXX_INCLUDED

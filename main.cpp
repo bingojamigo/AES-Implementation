@@ -14,12 +14,12 @@ int main()
 
     std::array<byte, 16> message{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 
-    cryptor.Encrypt( std::begin(message), std::end(message) );
+    cryptor.encrypt( std::begin(message), std::end(message) );
 
     std::cout << "Encrypted: ";
     std::copy( message.begin(), message.end(), std::ostream_iterator<short>(std::cout, " ") );
 
-    cryptor.Decrypt( std::begin(message), std::end(message) );
+    cryptor.decrypt( std::begin(message), std::end(message) );
 
     std::cout << "\nDecrypted: ";
     std::copy( message.begin(), message.end(), std::ostream_iterator<short>(std::cout, " ") );

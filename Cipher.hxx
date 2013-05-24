@@ -11,19 +11,13 @@ typedef byte (&state_type_reference)[4][Nb];
 typedef byte const (&state_type_const_reference)[4][Nb];
 typedef byte (*state_type_pointer)[4][Nb];
 
-template<KeySize key_size>
-using expanded_key_type = std::array<word, Nb*(Nr(key_size)+1)> ;
-
-/// The coefficients of the matrix.
-extern std::array<byte, 4> const mixColCoefficientsCipher,
-                                 mixColCoefficientsInverseCipher;
 
 /**
  * \param state The state-Array
  * \param w A pointer to Nb consecutive words in memory who are the keys
  */
 void AddRoundKey( state_type_reference state,
-                  word const* w);
+                  word const* w );
 
 void SubBytes( state_type_reference state, bool inverse );
 
@@ -32,25 +26,6 @@ void SubBytes( state_type_reference state, bool inverse );
 void ShiftRows( state_type_reference state, bool direction );
 
 void MixColumns( state_type_reference state, std::array<byte, 4> const& coeff );
-
-template<KeySize Nk>
-void KeyExpansion( Key<Nk> const& key, expanded_key_type<Nk>& w )
-{
-    std::copy( key.begin(), key.end(), w.begin() );
-
-    word temp;
-    for( std::size_t i = Nk; i < w.size(); ++i )
-    {
-        temp = w[i-1];
-
-        if (i % Nk == 0)
-            temp = SubWord(cyclicBitLeftShift(temp, 8)) ^ getRcon(i/Nk);
-        else if (Nk > 6 && i % Nk == 4)
-            temp = SubWord(temp); // TODO: Implement all the functions! Follow the PDF!
-
-        w[i] = temp ^ w[i-Nk];
-    }
-}
 
 /// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -64,20 +39,24 @@ void copy( byte* first, byte* last, state_type_reference state )
             auto iter = first + index;
 
             if( iter < last )
+            {
                 if(inputToState)
                     state[r][c] = first[index];
                 else
                     first[index] = state[r][c];
+            }
         }
 }
 
-/// [message, message + 16) is being crypted
+/// [message, message + maximum) is being crypted
 template<KeySize Nk>
 void Cipher( byte* message,
              std::size_t maximum, /// message + maximum is considered the end
              word const* w )
 {
     state_type state;
+
+    static std::array<byte, 4> constexpr mixColCoefficientsCipher{ 2, 3, 1, 1};
 
     copy<true>( message, message + maximum, state );
 
@@ -105,6 +84,8 @@ void InvCipher( byte* message, /// An iterator pointing to the message
 {
     state_type state;
 
+    static std::array<byte, 4> constexpr mixColCoefficientsInverseCipher{ 0xE, 0xB, 0xD, 0x9 };
+
     copy<true>( message, message + maximum, state );
 
     AddRoundKey(state, w + Nr(Nk)*Nb);
@@ -131,42 +112,33 @@ class RijndaelCrypt
 {
 public:
 
-    static constexpr KeySize key_size = Nk;
+    typedef Key<Nk> key_type;
 
-    typedef Key<key_size> key_type;
+    static constexpr KeySize keysize = key_type::keysize;
 
-    typedef expanded_key_type<key_size> this_expanded_key_type;
+    key_type const key;
 
-private:
-
-    this_expanded_key_type mKeyArray;
-
-public:
-
-    RijndaelCrypt( key_type const& key )
-    { KeyExpansion<key_size>( key, mKeyArray ); }
-
-    RijndaelCrypt( this_expanded_key_type const& ex_keys ):
-        mKeyArray{ex_keys} {}
+    RijndaelCrypt( key_type const& key ):
+        key{key} {}
 
     template<typename CryptFunc>
-    void ApplyCrypt( byte* first, byte* last, CryptFunc crypter )
+    void applyCrypt( byte* first, byte* last, CryptFunc crypter )
     {
         int dist = std::distance(first, last);
 
         while( dist > 0 )
         {
-            crypter( first, dist, mKeyArray.data() );
+            crypter( first, dist, key );
             dist -= 4 * Nb;
             first += 4 * Nb;
         }
     }
 
-    void Encrypt( byte* first, byte* last )
-    { ApplyCrypt(first, last, Cipher<key_size>); }
+    void encrypt( byte* first, byte* last )
+    { applyCrypt(first, last, Cipher<keysize>); }
 
-    void Decrypt( byte* first, byte* last )
-    { ApplyCrypt(first, last, InvCipher<key_size>); }
+    void decrypt( byte* first, byte* last )
+    { applyCrypt(first, last, InvCipher<keysize>); }
 
 };
 

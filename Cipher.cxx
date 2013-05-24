@@ -1,15 +1,11 @@
 #include "Cipher.hxx"
 
-std::array<byte, 4> const mixColCoefficientsCipher       { 2,   3,   1,   1   },
-                          mixColCoefficientsInverseCipher{ 0xE, 0xB, 0xD, 0x9 };
-
-
 void AddRoundKey( state_type_reference state,
                   word const* w)
 {
     for( size_t r = 0; r < 4; ++r )
         for( size_t c = 0; c < Nb; ++c )
-            state[r][c] ^= get_byte(w[c], 4-r-1);
+            state[r][c] ^= get_byte( w[c], 4-r-1);
 }
 
 void SubBytes( state_type_reference state, bool inverse )
