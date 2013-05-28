@@ -12,7 +12,7 @@ int main()
 
     RijndaelCrypt<Nk_4> cryptor( key );
 
-    std::array<byte, 16> message{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+    std::array<byte, 16> message{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}};
 
     cryptor.encrypt( std::begin(message), std::end(message) );
 

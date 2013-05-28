@@ -4,7 +4,7 @@ void AddRoundKey( state_type_reference state,
                   word const* w)
 {
     for( size_t r = 0; r < 4; ++r )
-        for( size_t c = 0; c < Nb; ++c )
+        for( size_t c = 0; c < static_cast<size_t>(Nb); ++c )
             state[r][c] ^= get_byte( w[c], 4-r-1);
 }
 
@@ -53,7 +53,7 @@ byte gf28_mul( byte lhs, byte rhs )
 
 void MixColumns( state_type_reference state, std::array<byte, 4> const& coeff )
 {
-    for( unsigned col = 0; col < Nb; ++col )
+    for( unsigned col = 0; col < static_cast<unsigned>(Nb); ++col )
     {
         byte const a = state[0][col],
                    b = state[1][col],
