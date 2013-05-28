@@ -2,6 +2,7 @@
 #define ARRAYS_HXX_INCLUDED
 
 #include "Basic.hxx"
+#include <cstddef>
 
 word getRcon(size_t i);
 

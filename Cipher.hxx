@@ -33,7 +33,7 @@ template<bool inputToState>
 void copy( byte* first, byte* last, state_type_reference state )
 {
     for( unsigned r = 0; r < 4; ++r )
-        for( unsigned c = 0; c < Nb; ++c )
+        for( unsigned c = 0; c < static_cast<unsigned>(Nb); ++c )
         {
             auto index = r + 4*c;
             auto iter = first + index;
@@ -56,19 +56,19 @@ void Cipher( byte* message,
 {
     state_type state;
 
-    static std::array<byte, 4> constexpr mixColCoefficientsCipher{ 2, 3, 1, 1};
+    static std::array<byte, 4> constexpr mixColCoefficientsCipher{{ 2, 3, 1, 1}};
 
     copy<true>( message, message + maximum, state );
 
     AddRoundKey(state, w);
 
-    for( unsigned round = 1; round < Nr(Nk) + 1; ++round )
+    for( unsigned round = 1; round < static_cast<unsigned>(Nr(Nk) + 1); ++round )
     {
         SubBytes(state, false);
 
         ShiftRows(state, false);
 
-        if( round != Nr(Nk) ) // skip mix-columns in last round
+        if( round != static_cast<unsigned>(Nr(Nk)) ) // skip mix-columns in last round
             MixColumns(state, mixColCoefficientsCipher);
 
         AddRoundKey(state, w + round*Nb);
@@ -84,7 +84,7 @@ void InvCipher( byte* message, /// An iterator pointing to the message
 {
     state_type state;
 
-    static std::array<byte, 4> constexpr mixColCoefficientsInverseCipher{ 0xE, 0xB, 0xD, 0x9 };
+    static std::array<byte, 4> constexpr mixColCoefficientsInverseCipher{{ 0xE, 0xB, 0xD, 0x9 }};
 
     copy<true>( message, message + maximum, state );
 

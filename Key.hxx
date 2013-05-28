@@ -26,7 +26,7 @@ struct Key
 {
     static KeySize constexpr keysize = Nk;
 
-    static auto constexpr round_number = Nr(keysize),
+    static std::size_t constexpr round_number = Nr(keysize),
                           word_number = Nb*(Nr(keysize)+1);
 
 private:
